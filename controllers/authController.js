@@ -4,7 +4,7 @@ const jwt = require('jsonwebtoken');
 const { generateToken } = require('../utils/generateToken');
 // const { get } = require('mongoose');
 
-async function registerUser(req, res) {
+module.exports.registerUser = async function (req, res) {
     try{
         let { fullname, email, password } = req.body;
 
@@ -36,7 +36,10 @@ async function registerUser(req, res) {
                     // res.send(token);
                     // demo: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6IjFAZWcuY29tIiwiaWF0IjoxNzczNjgxNjM5fQ.hESo-BzU3h4HJlQO5j649hrZyKyo26l_rIu7m-2Hsi4
 
-                    res.cookie("token", token);
+                    res.cookie("token", token,{
+                        httpOnly: true,                      // cannot be accessed by client JS
+                        secure: process.env.NODE_ENV === "production"
+                    });
                     res.send("user registered successfully");
                 }
             });
@@ -48,5 +51,27 @@ async function registerUser(req, res) {
     }
 }
 
+module.exports.loginUser = async function (req, res) {
+    // console.log("login route hit");
 
-module.exports.registerUser = registerUser;
+    let {email, password} = req.body;
+
+    let user = await userModel.findOne({ email });
+    if (!user) {
+        return res.status(400).send("Incorrect email or password");
+    }
+
+    bcrypt.compare(password, user.password, function(err, result) {
+        if (err) return res.send(err.message);
+        if (result) {
+            let token = generateToken(user);
+            res.cookie("token", token);
+            res.send("user logged in successfully");
+        } else {
+            res.status(400).send("Incorrect email or password");
+        }
+    });
+}
+
+
+// module.exports.registerUser = registerUser;
