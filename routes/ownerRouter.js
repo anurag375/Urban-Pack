@@ -8,7 +8,7 @@ if(process.env.NODE_ENV === "development"){
         let owner = await ownerModel.find();    // better: .findOne()
         if(owner.length > 0){   // better: if(owner)
             return res
-            .status(504)
+            .status(503)
             .send("CANNOT CREATE new owner. Owner already exists");
         }
 

@@ -9,6 +9,7 @@ const userSchema = mongoose.Schema({
         trim: true
     },
     email: String,
+    // email: { type: String, unique: true },
     password: String,
     cart: {
         type: Array,
