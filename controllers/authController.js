@@ -67,10 +67,19 @@ module.exports.loginUser = async function (req, res) {
             let token = generateToken(user);
             res.cookie("token", token);
             res.send("user logged in successfully");
+            // res.redirect("/shop");
         } else {
-            res.status(400).send("Incorrect email or password");
+            // res.status(400).send("Incorrect email or password");
+            req.flash("error", "Incorrect email or password");
+            return res.redirect("/");
         }
     });
+}
+
+module.exports.logoutUser = function (req, res) {
+    // res.clearCookie("token");    // it doesn't work in some cases (like when secure flag is true) so we are setting token cookie to empty string
+    res.cookie("token", "");
+    res.redirect("/");
 }
 
 
