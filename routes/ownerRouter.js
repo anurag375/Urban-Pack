@@ -37,6 +37,10 @@ router.get("/", (req, res) => {
     // we create our "response handlers" (in services) in a separate file called ownerController.js and then we import those handlers here and use them in the routes. 
 });
 
+router.get("/admin", (req, res) => {
+    res.render("create-products");
+});
+
 
 // console.log(process.env.NODE_ENV, "from owners");
 
