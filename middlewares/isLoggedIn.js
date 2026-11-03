@@ -1,4 +1,4 @@
-const jwt =  require('jsonwebto');
+const jwt =  require('jsonwebtoken');
 const userModel = require('../models/user-model');
 
 module.exports = async function (req, res, next) {
@@ -11,7 +11,7 @@ module.exports = async function (req, res, next) {
         let decoded = jwt.verify(req.cookies.token, process.env.JWT_KEY);
         let user = await userModel
         .findOne({ email: decoded.email })
-        .select("-password");  // excluding password field from the result
+        .select("-password");  // excluding password field from the result (because we will not need it)
         req.user = user;    // attaching user to the request object
         next();
     } catch (error) {

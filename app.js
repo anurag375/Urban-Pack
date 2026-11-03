@@ -18,23 +18,32 @@ app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, "public")));
 
-app.use(
+app.use(    // middleware for sessions => as "flash" messages needs sessions
     expressSession({
-        resave: false,
-        saveUninitialized: false,
+        resave: false,  // don't create sessions for unchanged data
+        saveUninitialized: false,   // don't create sessions for uninitialized/unloggedin users
         secret: process.env.Express_SESSION_SECRET
     })
 );
-app.use(flash());
+app.use(flash());   // setup "flash" messages
 
 app.set("view engine", "ejs");
 
 app.use("/owner", ownerRuter);
-app.use("/user", userRouter);
-app.use("/product", productRouter);
+app.use("/users", userRouter);
+app.use("/products", productRouter);
 
-app.get("/", (req, res) => {
-    res.send("default route working in APP.js");
-})
+// app.get("/", (req, res) => {
+//     res.send("default route working in APP.js");
+// })
 
-app.listen(3000);
+// app.listen(3000);
+
+// 3. Mount the index router on the root path
+const indexRouter = require('./routes/index');
+app.use('/', indexRouter);
+
+// 4. Start the server on port 3000
+app.listen(3000, () => {
+    console.log("Server running on http://localhost:3000");
+});
