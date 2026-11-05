@@ -8,6 +8,10 @@ module.exports.registerUser = async function (req, res) {
     try{
         let { fullname, email, password } = req.body;
 
+        // 2 chances of error: 
+        // 1. suppose user doesn't provide password, mongoose will throw an error because password is required in the schema. (although, mongodb will accept it as null, which can be handled by npm 'Joi' module, but we are not using it here).
+        // 2. suppose above password is not there, and user gives a password, frontend gives it, then backend crashes
+
         // 1. Check if email already exists:
         let existingUser = await userModel.findOne({ email });
         if (existingUser) {
@@ -38,7 +42,8 @@ module.exports.registerUser = async function (req, res) {
 
                     res.cookie("token", token,{
                         httpOnly: true,                      // cannot be accessed by client JS
-                        secure: process.env.NODE_ENV === "production"
+                        secure: process.env.NODE_ENV === "production",
+                        sameSite: "lax"
                     });
                     res.send("user registered successfully");
                 }
@@ -65,13 +70,16 @@ module.exports.loginUser = async function (req, res) {
         if (err) return res.send(err.message);
         if (result) {
             let token = generateToken(user);
-            res.cookie("token", token);
-            res.send("user logged in successfully");
-            // res.redirect("/shop");
-        } else {
-            // res.status(400).send("Incorrect email or password");
-            req.flash("error", "Incorrect email or password");
-            return res.redirect("/");
+            res.cookie("token", token,{
+                        httpOnly: true,                      // cannot be accessed by client JS
+                        secure: process.env.NODE_ENV === "production",
+                        sameSite: "lax"
+                    });
+            // res.send("user logged in successfully");
+            // console.log("user logged in successfully");
+            req.flash("success", "user logged in successfully");
+            return res.redirect("/shop");
+
         }
     });
 }

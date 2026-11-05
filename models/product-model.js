@@ -3,6 +3,7 @@ const mongoose = require('mongoose');
 // mongoose.connect('mongodb://127.0.0.1:27017/Urban-Pack');
 
 const productSchema = mongoose.Schema({
+    image: Buffer,
     name: String,
     price: Number,
     discount: {
@@ -12,7 +13,7 @@ const productSchema = mongoose.Schema({
     bgcolor: String,
     panelcolor: String,
     textcolor: String,
-    image: Buffer
+    // image: Buffer
 });
 
 module.exports = mongoose.model('product', productSchema);

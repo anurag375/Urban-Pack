@@ -38,7 +38,10 @@ router.get("/", (req, res) => {
 });
 
 router.get("/admin", (req, res) => {
-    res.render("create-products");
+    // res.send("owner admin working");
+
+    let success = req.flash("success");
+    res.render("create-products", { success });
 });
 
 
