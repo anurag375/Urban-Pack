@@ -19,7 +19,20 @@ router.get("/shop", isLoggedIn, async (req, res) => {
 });
 
 router.get("/cart", isLoggedIn, async (req, res) => {
-    res.render("cart");
+    let user = await userModel
+    .findOne({ email: req.user.email })
+    .populate("cart");      // you can later use "aggregation pipelines" to get filtered data (might be difficult initially)
+
+    // console.log(user.cart);
+
+    // Calculate bill safely:
+    let bill = 0;
+    if (user.cart && user.cart.length > 0) {
+        for (let i = 0; i < user.cart.length; i++) {
+            bill += Number(user.cart[i].price) + 20 - Number(user.cart[i].discount);
+        }
+    }
+    res.render("cart", { user, bill });
 });
 
 router.get("/add-to-cart/:id", isLoggedIn, async (req, res) => {
@@ -29,6 +42,7 @@ router.get("/add-to-cart/:id", isLoggedIn, async (req, res) => {
     await user.save();
     req.flash("success", "Product added to cart");
     res.redirect("/shop");
+
 });
 
 module.exports = router;
