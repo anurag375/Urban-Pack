@@ -2,6 +2,7 @@ const express = require('express');
 const isLoggedIn = require('../middlewares/isLoggedIn');
 const productModel = require('../models/product-model');
 const router = express.Router();
+const userModel = require('../models/user-model');
 
 router.get("/", (req, res) => {
     // res.render("index");
@@ -13,7 +14,21 @@ router.get("/", (req, res) => {
 router.get("/shop", isLoggedIn, async (req, res) => {
 
     let products = await productModel.find();
-    res.render("shop", { products });
+    let success = req.flash("success");
+    res.render("shop", { products, success });
+});
+
+router.get("/cart", isLoggedIn, async (req, res) => {
+    res.render("cart");
+});
+
+router.get("/add-to-cart/:id", isLoggedIn, async (req, res) => {
+    // Implementation for adding product to cart
+    let user = await userModel.findOne({ email: req.user.email });
+    user.cart.push(req.params.id);
+    await user.save();
+    req.flash("success", "Product added to cart");
+    res.redirect("/shop");
 });
 
 module.exports = router;
